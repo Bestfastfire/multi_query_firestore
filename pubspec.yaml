@@ -1,6 +1,6 @@
 name: multi_query_firestore
 description: The best way to create multiple queries in the firestore with various conditions.
-version: 1.0.0
+version: 1.0.0+1
 homepage: https://github.com/Bestfastfire/multi_query_firestore
 
 environment:
