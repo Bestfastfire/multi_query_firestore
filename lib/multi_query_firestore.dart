@@ -1,7 +1,7 @@
 library multi_query_firestore;
 
 import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart'
-as platform;
+    as platform;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
@@ -21,7 +21,7 @@ enum _method {
   where
 }
 
-class MultiQueryFirestore implements Query{
+class MultiQueryFirestore implements Query {
   final _mainS = BehaviorSubject<QuerySnapshot>();
   Map<int, List<DocumentChange>> _docsChanges = {};
   Map<int, List<DocumentSnapshot>> _docs = {};
@@ -31,9 +31,9 @@ class MultiQueryFirestore implements Query{
 
   MultiQueryFirestore({@required this.list});
 
-  _initListening(){
-    if(!hasStarted){
-      for(int i = 0; i < list.length; i++){
+  _initListening() {
+    if (!hasStarted) {
+      for (int i = 0; i < list.length; i++) {
         final q = list[i];
 
         _values[i] = q.snapshots().listen((event) {
@@ -46,14 +46,12 @@ class MultiQueryFirestore implements Query{
   }
 
   _update() => _mainS.sink.add(MultiSnapshot(
-      docsChanges: _docsChanges.values.toList(),
-      docs: _docs.values.toList()
-  ));
+      docsChanges: _docsChanges.values.toList(), docs: _docs.values.toList()));
 
   List<int> _listSize([int i = 0]) => list.map<int>((e) => i++).toList();
 
   @override
-  Stream<QuerySnapshot> snapshots({includeMetadataChanges = false}){
+  Stream<QuerySnapshot> snapshots({includeMetadataChanges = false}) {
     _initListening();
     return _mainS.stream;
   }
@@ -61,26 +59,24 @@ class MultiQueryFirestore implements Query{
   @override
   Future<QuerySnapshot> getDocuments({
     platform.Source source = platform.Source.serverAndCache,
-  }) => _getDocuments();
+  }) =>
+      _getDocuments();
 
   Future<QuerySnapshot> _getDocuments({
     platform.Source source = platform.Source.serverAndCache,
-  }) async{
-    for(int i = 0; i < list.length; i++){
+  }) async {
+    for (int i = 0; i < list.length; i++) {
       final v = await list[i].getDocuments(source: source);
       _docsChanges[i] = v.documentChanges;
       _docs[i] = v.documents;
-
     }
 
     return MultiSnapshot(
-        docsChanges: _docsChanges.values.toList(),
-        docs: _docs.values.toList()
-    );
+        docsChanges: _docsChanges.values.toList(), docs: _docs.values.toList());
   }
 
   @required
-  dispose(){
+  dispose() {
     _values.forEach((key, value) {
       value.cancel();
     });
@@ -95,85 +91,52 @@ class MultiQueryFirestore implements Query{
 
   @override
   Query endAt(List values) {
-    _toOnly(
-        type: _method.endAt,
-        value: values
-    );
+    _toOnly(type: _method.endAt, value: values);
     return this;
   }
 
-  Query endAtOnly({
-    @required List values,
-    @required List<int> indexes
-  }){
-    _toOnly(
-        type: _method.endAt,
-        indexes: indexes,
-        value: values
-    );
+  Query endAtOnly({@required List values, @required List<int> indexes}) {
+    _toOnly(type: _method.endAt, indexes: indexes, value: values);
     return this;
   }
 
   @override
   Query endAtDocument(DocumentSnapshot documentSnapshot) {
-    _toOnly(
-        type: _method.endAtDocument,
-        value: documentSnapshot
-    );
+    _toOnly(type: _method.endAtDocument, value: documentSnapshot);
     return this;
   }
 
-  Query endAtDocumentOnly({
-    @required DocumentSnapshot documentSnapshot,
-    @required List<int> indexes
-  }){
-    _toOnly(
-        value: documentSnapshot,
-        type: _method.endAt,
-        indexes: indexes
-    );
+  Query endAtDocumentOnly(
+      {@required DocumentSnapshot documentSnapshot,
+      @required List<int> indexes}) {
+    _toOnly(value: documentSnapshot, type: _method.endAt, indexes: indexes);
     return this;
   }
 
   @override
   Query endBefore(List values) {
-    _toOnly(
-        type: _method.endBefore,
-        value: values
-    );
+    _toOnly(type: _method.endBefore, value: values);
     return this;
   }
 
-  Query endBeforeOnly({
-    @required List<int> indexes,
-    @required List values
-  }) {
-    _toOnly(
-        type: _method.endBefore,
-        indexes: indexes,
-        value: values
-    );
+  Query endBeforeOnly({@required List<int> indexes, @required List values}) {
+    _toOnly(type: _method.endBefore, indexes: indexes, value: values);
     return this;
   }
 
   @override
   Query endBeforeDocument(DocumentSnapshot documentSnapshot) {
-    _toOnly(
-        type: _method.endBeforeDocument,
-        value: documentSnapshot
-    );
+    _toOnly(type: _method.endBeforeDocument, value: documentSnapshot);
     return this;
   }
 
-  Query endBeforeDocumentOnly({
-    @required DocumentSnapshot documentSnapshot,
-    @required List<int> indexes
-  }){
+  Query endBeforeDocumentOnly(
+      {@required DocumentSnapshot documentSnapshot,
+      @required List<int> indexes}) {
     _toOnly(
         type: _method.endBeforeDocument,
         value: documentSnapshot,
-        indexes: indexes
-    );
+        indexes: indexes);
     return this;
   }
 
@@ -182,44 +145,24 @@ class MultiQueryFirestore implements Query{
 
   @override
   Query limit(int length) {
-    _toOnly(
-        type: _method.limit,
-        value: length
-    );
+    _toOnly(type: _method.limit, value: length);
     return this;
   }
 
-  Query limitOnly({
-    @required int length,
-    @required List<int> indexes
-  }){
-    _toOnly(
-        type: _method.limit,
-        indexes: indexes,
-        value: length
-    );
+  Query limitOnly({@required int length, @required List<int> indexes}) {
+    _toOnly(type: _method.limit, indexes: indexes, value: length);
     return this;
   }
 
   @override
   Query orderBy(field, {bool descending = false}) {
-    _toOnly(
-        type: _method.orderBy,
-        descending: descending
-    );
+    _toOnly(type: _method.orderBy, descending: descending);
     return this;
   }
 
-  Query orderByOnly({
-    @required field,
-    @required List<int> indexes,
-    bool descending = false
-  }){
-    _toOnly(
-        descending: descending,
-        type: _method.orderBy,
-        indexes: indexes
-    );
+  Query orderByOnly(
+      {@required field, @required List<int> indexes, bool descending = false}) {
+    _toOnly(descending: descending, type: _method.orderBy, indexes: indexes);
     return this;
   }
 
@@ -230,100 +173,69 @@ class MultiQueryFirestore implements Query{
 
   @override
   Query startAfter(List values) {
-    _toOnly(
-        type: _method.startAfter,
-        value: values
-    );
+    _toOnly(type: _method.startAfter, value: values);
     return this;
   }
 
-  Query startAfterOnly({
-    @required List values,
-    @required List<int> indexes
-  }){
-    _toOnly(
-        type: _method.startAfter,
-        indexes: indexes,
-        value: values
-    );
+  Query startAfterOnly({@required List values, @required List<int> indexes}) {
+    _toOnly(type: _method.startAfter, indexes: indexes, value: values);
     return this;
   }
 
   @override
   Query startAfterDocument(DocumentSnapshot documentSnapshot) {
-    _toOnly(
-        type: _method.startAfterDocument,
-        value: documentSnapshot
-    );
+    _toOnly(type: _method.startAfterDocument, value: documentSnapshot);
     return this;
   }
 
-  Query startAfterDocumentOnly({
-    @required DocumentSnapshot documentSnapshot,
-    @required List<int> indexes
-  }){
+  Query startAfterDocumentOnly(
+      {@required DocumentSnapshot documentSnapshot,
+      @required List<int> indexes}) {
     _toOnly(
         type: _method.startAfterDocument,
         value: documentSnapshot,
-        indexes: indexes
-    );
+        indexes: indexes);
     return this;
   }
 
   @override
   Query startAt(List values) {
-    _toOnly(
-        type: _method.startAt,
-        value: values
-    );
+    _toOnly(type: _method.startAt, value: values);
     return this;
   }
 
-  Query startAtOnly({
-    @required List values,
-    @required List<int> indexes
-  }){
-    _toOnly(
-        type: _method.startAt,
-        indexes: indexes,
-        value: values
-    );
+  Query startAtOnly({@required List values, @required List<int> indexes}) {
+    _toOnly(type: _method.startAt, indexes: indexes, value: values);
     return this;
   }
 
   @override
   Query startAtDocument(DocumentSnapshot documentSnapshot) {
-    _toOnly(
-        type: _method.startAtDocument,
-        value: documentSnapshot
-    );
+    _toOnly(type: _method.startAtDocument, value: documentSnapshot);
     return this;
   }
 
-  Query startAtDocumentOnly({
-    @required DocumentSnapshot documentSnapshot,
-    @required List<int> indexes
-  }){
+  Query startAtDocumentOnly(
+      {@required DocumentSnapshot documentSnapshot,
+      @required List<int> indexes}) {
     _toOnly(
         type: _method.startAtDocument,
         value: documentSnapshot,
-        indexes: indexes
-    );
+        indexes: indexes);
     return this;
   }
 
   @override
-  Query where(dynamic field, {
-    dynamic isEqualTo,
-    dynamic isLessThan,
-    dynamic isLessThanOrEqualTo,
-    dynamic isGreaterThan,
-    dynamic isGreaterThanOrEqualTo,
-    dynamic arrayContains,
-    List<dynamic> arrayContainsAny,
-    List<dynamic> whereIn,
-    bool isNull
-  }) {
+  Query where(dynamic field,
+      {dynamic isEqualTo,
+      dynamic isLessThan,
+      dynamic isLessThanOrEqualTo,
+      dynamic isGreaterThan,
+      dynamic isGreaterThanOrEqualTo,
+      dynamic arrayContains,
+      List<dynamic> arrayContainsAny,
+      List<dynamic> whereIn,
+      bool isNull}) {
     _toOnly(
         type: _method.where,
         isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
@@ -334,24 +246,22 @@ class MultiQueryFirestore implements Query{
         isLessThan: isLessThan,
         isEqualTo: isEqualTo,
         whereIn: whereIn,
-        isNull: isNull
-    );
+        isNull: isNull);
     return this;
   }
 
-  Query whereOnly({
-    @required dynamic field,
-    @required List<int> indexes,
-    dynamic isEqualTo,
-    dynamic isLessThan,
-    dynamic isLessThanOrEqualTo,
-    dynamic isGreaterThan,
-    dynamic isGreaterThanOrEqualTo,
-    dynamic arrayContains,
-    List<dynamic> arrayContainsAny,
-    List<dynamic> whereIn,
-    bool isNull
-  }) {
+  Query whereOnly(
+      {@required dynamic field,
+      @required List<int> indexes,
+      dynamic isEqualTo,
+      dynamic isLessThan,
+      dynamic isLessThanOrEqualTo,
+      dynamic isGreaterThan,
+      dynamic isGreaterThanOrEqualTo,
+      dynamic arrayContains,
+      List<dynamic> arrayContainsAny,
+      List<dynamic> whereIn,
+      bool isNull}) {
     _toOnly(
         type: _method.where,
         indexes: indexes,
@@ -363,28 +273,26 @@ class MultiQueryFirestore implements Query{
         isLessThan: isLessThan,
         isEqualTo: isEqualTo,
         whereIn: whereIn,
-        isNull: isNull
-    );
+        isNull: isNull);
     return this;
   }
 
-  Query _toOnly({
-    List<int> indexes,
-    @required _method type,
-    bool descending = false,
-    dynamic value,
-    dynamic isEqualTo,
-    dynamic isLessThan,
-    dynamic isLessThanOrEqualTo,
-    dynamic isGreaterThan,
-    dynamic isGreaterThanOrEqualTo,
-    dynamic arrayContains,
-    List<dynamic> arrayContainsAny,
-    List<dynamic> whereIn,
-    bool isNull
-  }){
+  Query _toOnly(
+      {List<int> indexes,
+      @required _method type,
+      bool descending = false,
+      dynamic value,
+      dynamic isEqualTo,
+      dynamic isLessThan,
+      dynamic isLessThanOrEqualTo,
+      dynamic isGreaterThan,
+      dynamic isGreaterThanOrEqualTo,
+      dynamic arrayContains,
+      List<dynamic> arrayContainsAny,
+      List<dynamic> whereIn,
+      bool isNull}) {
     (indexes ?? _listSize()).forEach((i) {
-      switch(type){
+      switch (type) {
         case _method.endAt:
           list[i].endAt(value);
           break;
@@ -406,9 +314,7 @@ class MultiQueryFirestore implements Query{
           break;
 
         case _method.orderBy:
-          list[i].orderBy(value,
-              descending: descending
-          );
+          list[i].orderBy(value, descending: descending);
           break;
 
         case _method.startAfter:
@@ -437,8 +343,7 @@ class MultiQueryFirestore implements Query{
               arrayContains: arrayContains,
               arrayContainsAny: arrayContainsAny,
               whereIn: whereIn,
-              isNull: isNull
-          );
+              isNull: isNull);
           break;
       }
     });
@@ -447,28 +352,25 @@ class MultiQueryFirestore implements Query{
   }
 }
 
-class MultiSnapshot implements QuerySnapshot{
+class MultiSnapshot implements QuerySnapshot {
   final List<List<DocumentChange>> docsChanges;
   final List<List<DocumentSnapshot>> docs;
 
-  const MultiSnapshot({
-    @required this.docsChanges,
-    @required this.docs
-  });
+  const MultiSnapshot({@required this.docsChanges, @required this.docs});
 
   @override
-  List<DocumentChange> get documentChanges => docsChanges
-      .fold<List<DocumentChange>>([], (c, e){
-    c.addAll(e);
-    return c;
-  }).toList();
+  List<DocumentChange> get documentChanges =>
+      docsChanges.fold<List<DocumentChange>>([], (c, e) {
+        c.addAll(e);
+        return c;
+      }).toList();
 
   @override
-  List<DocumentSnapshot> get documents => docs
-      .fold<List<DocumentSnapshot>>([], (c, e){
-    c.addAll(e);
-    return c;
-  }).toList();
+  List<DocumentSnapshot> get documents =>
+      docs.fold<List<DocumentSnapshot>>([], (c, e) {
+        c.addAll(e);
+        return c;
+      }).toList();
 
   @override
   SnapshotMetadata get metadata => throw UnimplementedError();

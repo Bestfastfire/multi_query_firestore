@@ -11,28 +11,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<QuerySnapshot>(
-        stream: MultiQueryFirestore(
-            list: [
-                _fs.collection('users').where('age', isLessThan: 10),
-                _fs.collection('users').where('age', isGreaterThan: 20),
-                _fs.collection('people').where('height', isGreaterThan: 172)
-            ]
-        ).snapshots(),
-        builder: (c, s){
-          if(s.connectionState != ConnectionState.done){
-            return Center(
-              child: CircularProgressIndicator()
-            );
+        stream: MultiQueryFirestore(list: [
+          _fs.collection('users').where('age', isLessThan: 10),
+          _fs.collection('users').where('age', isGreaterThan: 20),
+          _fs.collection('people').where('height', isGreaterThan: 172)
+        ]).snapshots(),
+        builder: (c, s) {
+          if (s.connectionState != ConnectionState.done) {
+            return Center(child: CircularProgressIndicator());
           }
 
           final list = s.data.documents;
 
           return ListView.builder(
-            itemCount: list.length,
-            itemBuilder: (c, i) => ListTile(
-              title: Text(list[i].data['name'])
-            )
-          );
+              itemCount: list.length,
+              itemBuilder: (c, i) =>
+                  ListTile(title: Text(list[i].data['name'])));
         },
       ),
     );
