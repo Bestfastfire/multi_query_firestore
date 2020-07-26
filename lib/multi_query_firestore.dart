@@ -294,47 +294,47 @@ class MultiQueryFirestore implements Query {
     (indexes ?? _listSize()).forEach((i) {
       switch (type) {
         case _method.endAt:
-          list[i].endAt(value);
+          list[i] = list[i].endAt(value);
           break;
 
         case _method.endAtDocument:
-          list[i].endAtDocument(value);
+          list[i] = list[i].endAtDocument(value);
           break;
 
         case _method.endBefore:
-          list[i].endBefore(value);
+          list[i] = list[i].endBefore(value);
           break;
 
         case _method.endBeforeDocument:
-          list[i].endBeforeDocument(value);
+          list[i] = list[i].endBeforeDocument(value);
           break;
 
         case _method.limit:
-          list[i].limit(value);
+          list[i] = list[i].limit(value);
           break;
 
         case _method.orderBy:
-          list[i].orderBy(value, descending: descending);
+          list[i] = list[i].orderBy(value, descending: descending);
           break;
 
         case _method.startAfter:
-          list[i].startAfter(value);
+          list[i] = list[i].startAfter(value);
           break;
 
         case _method.startAfterDocument:
-          list[i].startAfterDocument(value);
+          list[i] = list[i].startAfterDocument(value);
           break;
 
         case _method.startAt:
-          list[i].startAt(value);
+          list[i] = list[i].startAt(value);
           break;
 
         case _method.startAtDocument:
-          list[i].startAtDocument(value);
+          list[i] = list[i].startAtDocument(value);
           break;
 
         case _method.where:
-          list[i].where(value,
+          list[i] = list[i].where(value,
               isEqualTo: isEqualTo,
               isLessThan: isLessThan,
               isLessThanOrEqualTo: isLessThanOrEqualTo,
