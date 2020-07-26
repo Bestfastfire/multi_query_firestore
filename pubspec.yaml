@@ -1,6 +1,6 @@
 name: multi_query_firestore
 description: The best way to create multiple queries in the firestore with various conditions.
-version: 1.0.0+1
+version: 1.0.0+2
 homepage: https://github.com/Bestfastfire/multi_query_firestore
 
 environment:
@@ -11,7 +11,7 @@ dependencies:
     sdk: flutter
   cloud_firestore_platform_interface: ^1.1.2
   cloud_firestore: ^0.13.7
-  rxdart: ^0.22.6
+  rxdart: ^0.24.1
 
 dev_dependencies:
   flutter_test:
