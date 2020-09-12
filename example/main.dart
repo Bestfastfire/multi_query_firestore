@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  final _fs = Firestore.instance;
+  final _fs = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +21,12 @@ class MyApp extends StatelessWidget {
             return Center(child: CircularProgressIndicator());
           }
 
-          final list = s.data.documents;
+          final list = s.data.docs;
 
           return ListView.builder(
               itemCount: list.length,
               itemBuilder: (c, i) =>
-                  ListTile(title: Text(list[i].data['name'])));
+                  ListTile(title: Text(list[i].data()['name'])));
         },
       ),
     );

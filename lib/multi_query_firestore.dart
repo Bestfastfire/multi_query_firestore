@@ -1,7 +1,5 @@
 library multi_query_firestore;
 
-import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart'
-    as platform;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
@@ -18,6 +16,7 @@ enum _method {
   startAfterDocument,
   startAt,
   startAtDocument,
+  limitToLast,
   where
 }
 
@@ -37,8 +36,8 @@ class MultiQueryFirestore implements Query {
         final q = list[i];
 
         _values[i] = q.snapshots().listen((event) {
-          _docsChanges[i] = event.documentChanges;
-          _docs[i] = event.documents;
+          _docsChanges[i] = event.docChanges;
+          _docs[i] = event.docs;
           _update();
         });
       }
@@ -46,34 +45,10 @@ class MultiQueryFirestore implements Query {
   }
 
   _update() => _mainS.sink.add(MultiSnapshot(
-      docsChanges: _docsChanges.values.toList(), docs: _docs.values.toList()));
+      docsChanges: _docsChanges.values.toList(),
+      docsList: _docs.values.toList()));
 
   List<int> _listSize([int i = 0]) => list.map<int>((e) => i++).toList();
-
-  @override
-  Stream<QuerySnapshot> snapshots({includeMetadataChanges = false}) {
-    _initListening();
-    return _mainS.stream;
-  }
-
-  @override
-  Future<QuerySnapshot> getDocuments({
-    platform.Source source = platform.Source.serverAndCache,
-  }) =>
-      _getDocuments();
-
-  Future<QuerySnapshot> _getDocuments({
-    platform.Source source = platform.Source.serverAndCache,
-  }) async {
-    for (int i = 0; i < list.length; i++) {
-      final v = await list[i].getDocuments(source: source);
-      _docsChanges[i] = v.documentChanges;
-      _docs[i] = v.documents;
-    }
-
-    return MultiSnapshot(
-        docsChanges: _docsChanges.values.toList(), docs: _docs.values.toList());
-  }
 
   @required
   dispose() {
@@ -85,8 +60,27 @@ class MultiQueryFirestore implements Query {
   }
 
   @override
-  Map<String, dynamic> buildArguments() {
-    throw UnimplementedError();
+  Stream<QuerySnapshot> snapshots({includeMetadataChanges = false}) {
+    _initListening();
+    return _mainS.stream;
+  }
+
+  @override
+  Future<QuerySnapshot> getDocuments([GetOptions options]) => _get(options);
+
+  @override
+  Future<QuerySnapshot> get([GetOptions options]) => _get(options);
+
+  Future<QuerySnapshot> _get([GetOptions options]) async {
+    for (int i = 0; i < list.length; i++) {
+      final v = await list[i].get(options);
+      _docsChanges[i] = v.docChanges;
+      _docs[i] = v.docs;
+    }
+
+    return MultiSnapshot(
+        docsChanges: _docsChanges.values.toList(),
+        docsList: _docs.values.toList());
   }
 
   @override
@@ -141,9 +135,6 @@ class MultiQueryFirestore implements Query {
   }
 
   @override
-  Firestore get firestore => this.firestore;
-
-  @override
   Query limit(int length) {
     _toOnly(type: _method.limit, value: length);
     return this;
@@ -164,11 +155,6 @@ class MultiQueryFirestore implements Query {
       {@required field, @required List<int> indexes, bool descending = false}) {
     _toOnly(descending: descending, type: _method.orderBy, indexes: indexes);
     return this;
-  }
-
-  @override
-  CollectionReference reference() {
-    throw UnimplementedError();
   }
 
   @override
@@ -222,6 +208,17 @@ class MultiQueryFirestore implements Query {
         type: _method.startAtDocument,
         value: documentSnapshot,
         indexes: indexes);
+    return this;
+  }
+
+  @override
+  Query limitToLast(int limit) {
+    _toOnly(type: _method.limitToLast, value: limit);
+    return this;
+  }
+
+  Query limitToLastOnly({@required int limit, @required List<int> indexes}) {
+    _toOnly(type: _method.limitToLast, indexes: indexes, value: limit);
     return this;
   }
 
@@ -345,18 +342,30 @@ class MultiQueryFirestore implements Query {
               whereIn: whereIn,
               isNull: isNull);
           break;
+
+        case _method.limitToLast:
+          list[i] = list[i].limitToLast(value);
+          break;
       }
     });
 
     return this;
   }
+
+  @override
+  Map<String, dynamic> get parameters => parametersOf(0);
+
+  Map<String, dynamic> parametersOf(int index) => this.list[index].parameters;
+
+  @override
+  FirebaseFirestore get firestore => this.firestore;
 }
 
 class MultiSnapshot implements QuerySnapshot {
   final List<List<DocumentChange>> docsChanges;
-  final List<List<DocumentSnapshot>> docs;
+  final List<List<QueryDocumentSnapshot>> docsList;
 
-  const MultiSnapshot({@required this.docsChanges, @required this.docs});
+  const MultiSnapshot({@required this.docsChanges, @required this.docsList});
 
   @override
   List<DocumentChange> get documentChanges =>
@@ -366,12 +375,28 @@ class MultiSnapshot implements QuerySnapshot {
       }).toList();
 
   @override
-  List<DocumentSnapshot> get documents =>
-      docs.fold<List<DocumentSnapshot>>([], (c, e) {
+  List<QueryDocumentSnapshot> get docs =>
+      docsList.fold<List<QueryDocumentSnapshot>>([], (c, e) {
         c.addAll(e);
         return c;
       }).toList();
 
   @override
-  SnapshotMetadata get metadata => throw UnimplementedError();
+  SnapshotMetadata get metadata =>
+      (docsList.length > 0 && docsList[0].length > 0)
+          ? docsList[0][0].metadata
+          : null;
+
+  @override
+  List<DocumentChange> get docChanges =>
+      docsChanges.fold<List<DocumentChange>>([], (c, e) {
+        c.addAll(e);
+        return c;
+      }).toList();
+
+  @override
+  int get size => docs.length;
+
+  @override
+  List<QueryDocumentSnapshot> get documents => docs;
 }
