@@ -225,6 +225,7 @@ class MultiQueryFirestore implements Query {
   @override
   Query where(dynamic field,
       {dynamic isEqualTo,
+      dynamic isNotEqualTo,
       dynamic isLessThan,
       dynamic isLessThanOrEqualTo,
       dynamic isGreaterThan,
@@ -232,15 +233,18 @@ class MultiQueryFirestore implements Query {
       dynamic arrayContains,
       List<dynamic> arrayContainsAny,
       List<dynamic> whereIn,
+      List<dynamic> whereNotIn,
       bool isNull}) {
     _toOnly(
         type: _method.where,
         isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
         isLessThanOrEqualTo: isLessThanOrEqualTo,
         arrayContainsAny: arrayContainsAny,
+        isNotEqualTo: isNotEqualTo,
         isGreaterThan: isGreaterThan,
         arrayContains: arrayContains,
         isLessThan: isLessThan,
+        whereNotIn: whereNotIn,
         isEqualTo: isEqualTo,
         whereIn: whereIn,
         isNull: isNull);
@@ -251,6 +255,7 @@ class MultiQueryFirestore implements Query {
       {@required dynamic field,
       @required List<int> indexes,
       dynamic isEqualTo,
+      dynamic isNotEqualTo,
       dynamic isLessThan,
       dynamic isLessThanOrEqualTo,
       dynamic isGreaterThan,
@@ -258,6 +263,7 @@ class MultiQueryFirestore implements Query {
       dynamic arrayContains,
       List<dynamic> arrayContainsAny,
       List<dynamic> whereIn,
+      List<dynamic> whereNotIn,
       bool isNull}) {
     _toOnly(
         type: _method.where,
@@ -265,10 +271,12 @@ class MultiQueryFirestore implements Query {
         isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
         isLessThanOrEqualTo: isLessThanOrEqualTo,
         arrayContainsAny: arrayContainsAny,
+        isNotEqualTo: isNotEqualTo,
         isGreaterThan: isGreaterThan,
         arrayContains: arrayContains,
         isLessThan: isLessThan,
         isEqualTo: isEqualTo,
+        whereNotIn: whereNotIn,
         whereIn: whereIn,
         isNull: isNull);
     return this;
@@ -280,6 +288,7 @@ class MultiQueryFirestore implements Query {
       bool descending = false,
       dynamic value,
       dynamic isEqualTo,
+      dynamic isNotEqualTo,
       dynamic isLessThan,
       dynamic isLessThanOrEqualTo,
       dynamic isGreaterThan,
@@ -287,6 +296,7 @@ class MultiQueryFirestore implements Query {
       dynamic arrayContains,
       List<dynamic> arrayContainsAny,
       List<dynamic> whereIn,
+      List<dynamic> whereNotIn,
       bool isNull}) {
     (indexes ?? _listSize()).forEach((i) {
       switch (type) {
@@ -333,12 +343,14 @@ class MultiQueryFirestore implements Query {
         case _method.where:
           list[i] = list[i].where(value,
               isEqualTo: isEqualTo,
+              isNotEqualTo: isNotEqualTo,
               isLessThan: isLessThan,
               isLessThanOrEqualTo: isLessThanOrEqualTo,
               isGreaterThan: isGreaterThan,
               isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
               arrayContains: arrayContains,
               arrayContainsAny: arrayContainsAny,
+              whereNotIn: whereNotIn,
               whereIn: whereIn,
               isNull: isNull);
           break;
